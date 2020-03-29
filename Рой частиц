@@ -1,0 +1,96 @@
+#include <iostream>
+#include <stdio.h>
+#include <ctime>
+#include <cstdlib>
+#include <cmath>
+
+using namespace std;
+const int N = 800;
+const int iter = 50;
+const double Q1 = 0.76;
+const double Q2 = 0.92;
+const double A = 0.621;
+
+struct particle {
+	double p;
+	double V_x;
+	double V_y;
+	double x;
+	double y;
+	double x_p;
+	double y_p;
+};
+
+double rnd() {
+	return rand() % 1000 / 1000.0;
+}
+
+double flesh(double V,double x1, double x2, double x) {
+	return ((A*V) + (Q1 * rnd()*(x1 - x)) + (Q2 * rnd()*(x2 - x)));
+}
+
+int main()
+{
+	srand(time(0));
+	cout.flush();
+	particle mas[N];
+
+	for (int i = 0; i < N; i++) {
+		mas[i].x = rand() % 201 - 100;
+		mas[i].y = rand() % 201 - 100;
+		mas[i].V_x = 0;
+		mas[i].V_y = 0;
+	}
+
+	double x, y,g = INFINITY;
+
+	for (int i = 0; i < N; i++) {
+		mas[i].p = INFINITY;
+	}
+
+	for (int i = 0; i < iter; i++) {
+
+		for (int w = 0; w < N; w++) {
+			cout.flush() << "? " << mas[w].x << " " << mas[w].y << endl;
+			double funs;
+			cin >> funs;
+			if (funs < g) {
+				g = funs;
+				x = mas[w].x;
+				y = mas[w].y;
+			}
+			if (funs < mas[w].p) {
+				mas[w].p = funs;
+				mas[w].x_p = mas[w].x;
+				mas[w].y_p = mas[w].y;
+			}
+		}
+
+		for (int e = 0; e < N; e++) {
+			mas[e].V_x = flesh(mas[e].V_x, mas[e].x_p, x, mas[e].x);
+			mas[e].V_y = flesh(mas[e].V_y, mas[e].y_p, y, mas[e].y);
+			if (abs(mas[e].V_x) > 50 || abs(mas[e].V_y) > 50) {
+				mas[e].V_x = 0;
+				mas[e].V_y = 0;
+			}
+
+		}
+
+		for (int r = 0; r < N; r++) {
+			mas[r].x = mas[r].x + mas[r].V_x;
+			mas[r].y = mas[r].y + mas[r].V_y;
+			if (mas[r].x > 100 || mas[r].x < -100 || mas[r].y > 100 || mas[r].y < -100) {
+				mas[r].x = rand() % 201 - 100;
+				mas[r].y = rand() % 201 - 100;
+				mas[r].V_x = 1.2;
+				mas[r].V_y = 1.2;
+			}
+		}
+
+	}
+
+	cout << "! " << x << " " << y << endl;
+
+	return 0;
+}
+
